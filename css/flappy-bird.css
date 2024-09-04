@@ -17,6 +17,7 @@
 
 body {
     background-color: var(--bg-color);
+    user-select: none;
     overflow: hidden;
 }
 
@@ -42,6 +43,15 @@ body {
     background-image: url("../flappy-bird-assets/sprites/background-day.png");
 }
 
+/* Game welcome */
+.game .container .game-board .welcome {
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+}
+
 /* Pipes */
 .game .container .game-board .pipes {
     width: var(--pipe-widht);
@@ -49,6 +59,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 100px;
+    transform: translateX(var(--game-width));
 }
 .game .container .game-board .pipes .upper-pipe,
 .game .container .game-board .pipes .lower-pipe {
@@ -73,7 +84,7 @@ body {
     width: 100%;
     height: 112px;
     background-image: url("../flappy-bird-assets/sprites/base.png");
-    animation: move 5s linear infinite;
+    /* animation: move 5s linear infinite; */
 }
 
 .game .container .game-board .ground::after {
