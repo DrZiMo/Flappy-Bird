@@ -26,6 +26,7 @@ function checkKey(e) {
 }
 
 function startGame() {
+    gameBoard.removeEventListener('click', startGame)
     welcome.style.setProperty('display', 'none');
     ground.style = `animation: move ${speed}s linear infinite;`;
     console.log("started the game");
