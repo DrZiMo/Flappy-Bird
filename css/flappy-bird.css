@@ -1,0 +1,96 @@
+
+:root {
+    --bg-color: #daf6d9;
+
+    --game-width: 480px;
+    --game-height: 640px;
+
+    --pipe-widht: 52px;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    overflow: hidden;
+}
+
+.game {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.game .container {
+    width: var(--game-width);
+    height: var(--game-height);
+    overflow: hidden;
+}
+
+.game .container .game-board {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-size: 297px;
+    background-image: url("../flappy-bird-assets/sprites/background-day.png");
+}
+
+/* Pipes */
+.game .container .game-board .pipes {
+    width: var(--pipe-widht);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 100px;
+}
+.game .container .game-board .pipes .upper-pipe,
+.game .container .game-board .pipes .lower-pipe {
+    width: 100%;
+    height: 100%;
+    background-image: url("../flappy-bird-assets/sprites/pipe-green.png");
+}
+
+.game .container .game-board .pipes .upper-pipe {
+    transform: rotate(180deg);
+    height: 102%;
+}
+
+.game .container .game-board .pipes .lower-pipe {
+    flex-basis: 1;
+}
+
+/* ground */
+.game .container .game-board .ground {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 112px;
+    background-image: url("../flappy-bird-assets/sprites/base.png");
+    animation: move 5s linear infinite;
+}
+
+.game .container .game-board .ground::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 112px;
+    transform: translateX(480px);
+    background-image: url("../flappy-bird-assets/sprites/base.png");
+}
+
+@keyframes move {
+    0% {
+        transform: translateX(0px);
+    }
+    100% {
+        transform: translateX(-480px);
+    }
+}
