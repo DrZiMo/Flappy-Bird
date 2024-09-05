@@ -1,7 +1,9 @@
 const gameBoard = document.querySelector('.game-board');
 const welcome = document.querySelector('.welcome');
 const score = document.querySelector('.score');
-const scoreImg = document.getElementById('score-img');
+const scoreImgH = document.getElementById('score-img1');
+const scoreImgT = document.getElementById('score-img2');
+const scoreImgO = document.getElementById('score-img3');
 const bird = document.querySelector('.bird');
 const birdImg = document.getElementById('bird-img');
 const ground = document.querySelector('.ground');
@@ -20,10 +22,11 @@ let currentFrame = 0;
 const frameDuration = 200;
 
 // let pipeX;
+let pipeWaitingTime = 2000; // in milliseconds
 let pipeSpeed = 5;
 let pipeGenerationSpeed;
-const maxPipeGenerationSpeed = 2000;
-const minPipeGenerationSpeed = 900;
+const maxPipeGenerationSpeed = 2500;
+const minPipeGenerationSpeed = 1500;
 const minPipeHeight = 146;
 const maxPipeHeight = 25;
 
@@ -52,11 +55,14 @@ function startGame() {
     isPlaying = true;
     window.removeEventListener('keydown', checkKey);
     gameBoard.removeEventListener('click', startGame)
+    scoreImgH.style.setProperty('display', 'none');
+    scoreImgT.style.setProperty('display', 'none');
+    scoreImgO.style.setProperty('display', 'inline');
     welcome.style.setProperty('display', 'none');
     score.style.setProperty('display', 'block');
     bird.style.setProperty('display', 'block');
     moveBird();
-    setTimeout(generatePipes, 2000)
+    setTimeout(generatePipes, pipeWaitingTime)
     ground.style = `animation: move ${speed}s linear infinite;`;
     console.log("started the game");
 }
@@ -99,17 +105,9 @@ function movePipes() {
     pipes.style = `animation: none`;
     if (isPlaying) {
         pipes.forEach(pipe => {
-            let rect = pipe.getBoundingClientRect();
-            let pipeX = rect.x;
-
-            if(pipeX <= 521) {
-                scoreCounter += 1;
-                
-            }
-
             pipe.style = `animation: movePipe ${pipeSpeed}s linear;`;
         })
-        // setTimeout(generatePipes, pipeGenerationSpeed);
+        setTimeout(generatePipes, pipeGenerationSpeed);
     }
 }
 
@@ -120,21 +118,52 @@ function managePipes() {
         const oldestPipe = pipes[0];
         oldestPipe.remove();
     }
-    // pipes.forEach(pipe => {
-    //     let rect = pipe.getBoundingClientRect();
-    //     let pipeXx = rect.x;
-
-    //     if (pipeXx > 302) {
-    //         Alert("PPIPWWWW")
-    //     }
-    // })
 }
 
-// setInterval(() => {
-//     // document.getElementById('c').innerHTML = scoreCounter;
+setInterval(() => {
+    updateScore();
+}, 100)
+
+function updateScore() {
+    const pipes = document.querySelectorAll('.pipes');
+    const birdRect = bird.getBoundingClientRect();
     
-    
-//     let rect = document.querySelector('.pipes').getBoundingClientRect();
-//     let pipeXy = rect.x;
-//     document.getElementById('c').innerHTML = pipeXy;
-// }, 1)
+    pipes.forEach(pipe => {
+        let pipeRect = pipe.getBoundingClientRect();
+        let pipeX = pipeRect.x;
+
+        // the 40 that is added to pipeX is to enture that the bird has completely passed the pipe
+        if (birdRect.x > (pipeX + 40) && !pipe.hasAttribute('scored')) {
+            scoreCounter++;
+            pipe.setAttribute('scored', 'true');
+            // document.getElementById('c').innerHTML = scoreCounter;
+            changeTheScoreImg(scoreCounter);
+        }
+    })
+}
+
+function changeTheScoreImg(score) {
+    let path = "flappy-bird-assets/sprites/";
+    if(score < 10) {
+        scoreImgO.src = `${path}${score}.png`;
+    }
+    else if (score > 9 && score < 100) {
+        scoreImgT.style.setProperty('display', 'inline');
+        let tens = Math.floor(score / 10);
+        let ones = score % 10;
+
+        scoreImgT.src = `${path}${tens}.png`;
+        scoreImgO.src = `${path}${ones}.png`
+    }
+    else if (score > 99 && score < 1000) {
+        scoreImgT.style.setProperty('display', 'inline');
+        scoreImgH.style.setProperty('display', 'inline');
+        let hundreds = Math.floor(score / 100);
+        let tens = Math.floor((score % 100) / 10);
+        let ones = score % 10;
+
+        scoreImgH.src = `${path}${hundreds}.png`;
+        scoreImgT.src = `${path}${tens}.png`;
+        scoreImgO.src = `${path}${ones}.png`
+    }
+}
