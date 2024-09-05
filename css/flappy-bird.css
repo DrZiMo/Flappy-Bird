@@ -113,7 +113,7 @@ body {
 .game .container .game-board .ground {
     position: absolute;
     bottom: 0;
-    width: 100%;
+    width: var(--game-width);
     height: 112px;
     background-image: url("../flappy-bird-assets/sprites/base.png");
     /* animation: move 5s linear infinite; */
