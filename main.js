@@ -8,6 +8,9 @@ const bird = document.querySelector('.bird');
 const birdImg = document.getElementById('bird-img');
 const ground = document.querySelector('.ground');
 
+let gravity = 1.5;
+let jumpHeight = 100; // 35
+let posiY = 0;
 let scoreCounter = 0;
 let isPlaying = false;
 let speed = 5;
@@ -62,6 +65,9 @@ function startGame() {
     score.style.setProperty('display', 'block');
     bird.style.setProperty('display', 'block');
     moveBird();
+    birdControl();
+    upplyGravity();
+    // setTimeout(upplyGravity, 1000)
     setTimeout(generatePipes, pipeWaitingTime)
     ground.style = `animation: move ${speed}s linear infinite;`;
     console.log("started the game");
@@ -136,7 +142,7 @@ function updateScore() {
         if (birdRect.x > (pipeX + 40) && !pipe.hasAttribute('scored')) {
             scoreCounter++;
             pipe.setAttribute('scored', 'true');
-            // document.getElementById('c').innerHTML = scoreCounter;
+            document.getElementById('c').innerHTML = scoreCounter;
             changeTheScoreImg(scoreCounter);
         }
     })
@@ -166,4 +172,19 @@ function changeTheScoreImg(score) {
         scoreImgT.src = `${path}${tens}.png`;
         scoreImgO.src = `${path}${ones}.png`
     }
+}
+
+function birdControl() {
+    gameBoard.onclick = () => {
+        posiY -= jumpHeight;
+    }
+}
+
+function upplyGravity() {
+    if (isPlaying) {
+        bird.style = `transform: translateY(${posiY}px)`
+        posiY += gravity;
+    }
+    setTimeout(upplyGravity, 1);
+    return posiY;
 }

@@ -75,6 +75,7 @@ body {
     width: var(--bird-width);
     height: var(--bird-height);
     z-index: 10;
+    transition: 0.2s;
 }
 
 .game .container .game-board .bird  img {
