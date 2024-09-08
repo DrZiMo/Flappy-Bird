@@ -8,8 +8,8 @@ const bird = document.querySelector('.bird');
 const birdImg = document.getElementById('bird-img');
 const ground = document.querySelector('.ground');
 
-let gravity = 1.5;
-let jumpHeight = 100; // 35
+let gravity = 4;
+let jumpHeight = 110; // 35
 let posiY = 0;
 let scoreCounter = 0;
 let isPlaying = false;
@@ -66,7 +66,7 @@ function startGame() {
     bird.style.setProperty('display', 'block');
     moveBird();
     birdControl();
-    upplyGravity();
+    applyGravity();
     // setTimeout(upplyGravity, 1000)
     setTimeout(generatePipes, pipeWaitingTime)
     ground.style = `animation: move ${speed}s linear infinite;`;
@@ -127,6 +127,7 @@ function managePipes() {
 }
 
 setInterval(() => {
+    // checkCollision();
     updateScore();
 }, 100)
 
@@ -142,7 +143,6 @@ function updateScore() {
         if (birdRect.x > (pipeX + 40) && !pipe.hasAttribute('scored')) {
             scoreCounter++;
             pipe.setAttribute('scored', 'true');
-            document.getElementById('c').innerHTML = scoreCounter;
             changeTheScoreImg(scoreCounter);
         }
     })
@@ -180,11 +180,78 @@ function birdControl() {
     }
 }
 
-function upplyGravity() {
+function applyGravity() {
     if (isPlaying) {
+        checkCollision();
         bird.style = `transform: translateY(${posiY}px)`
         posiY += gravity;
+        requestAnimationFrame(applyGravity);
+        // setTimeout(applyGravity, 1);
     }
-    setTimeout(upplyGravity, 1);
     return posiY;
+}
+
+function checkCollision() {
+    const pipes = document.querySelectorAll('.pipes');
+    const upperPipes = document.querySelectorAll('.upper-pipe');
+    const lowerPipes = document.querySelectorAll('.lower-pipe');
+
+    
+    const groundRect = ground.getBoundingClientRect();
+    const birdRect = bird.getBoundingClientRect();
+
+    // check if the bird touches the ground
+    if (birdRect.bottom >= groundRect.top) {
+        gameOver();
+    }
+
+    upperPipes.forEach((upperPipe) => {
+        const upperPipeRect = upperPipe.getBoundingClientRect();
+        // const lowerPipeRect = lowerPipe.getBoundingClientRect();
+        if (birdRect.left < upperPipeRect.right && birdRect.right > upperPipeRect.left &&
+            birdRect.top < upperPipeRect.bottom && birdRect.bottom > upperPipeRect.top) {
+            gameOver();
+        }
+    })
+
+    lowerPipes.forEach((lowerPipe) => {
+        const lowerPipeRect = lowerPipe.getBoundingClientRect();
+        if (birdRect.left < lowerPipeRect.right && birdRect.right > lowerPipeRect.left &&
+            birdRect.top < lowerPipeRect.bottom && birdRect.bottom > lowerPipeRect.top) {
+            gameOver();
+        }
+    })
+}
+
+function gameOver() {
+    fallAnimation();
+    isPlaying = false;
+    birdImg.src = "flappy-bird-assets/sprites/yellowbird-midflap.png";
+    ground.style.animation = "none";
+    
+    const pipes = document.querySelectorAll('.pipes');
+    pipes.forEach((pipe) => {
+        pipe.style = `animation: movePipe ${pipeSpeed}s linear; animation-play-state: paused;`;
+    })
+
+    console.log("Game Over");
+}
+
+function fallAnimation() {
+    const targetY = 136;
+    const fallSpeed = 10;
+
+    function animateFall() {
+        if (posiY < targetY) {
+            posiY += fallSpeed;
+            bird.style.transform = `translateY(${posiY}px)`;
+
+            requestAnimationFrame(animateFall);
+        } else {
+            posiY = targetY;
+            bird.style.transform = `translateY(${posiY}px)`;
+        }
+    }
+
+    animateFall();
 }
