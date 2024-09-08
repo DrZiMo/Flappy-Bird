@@ -33,6 +33,12 @@ const minPipeGenerationSpeed = 1500;
 const minPipeHeight = 146;
 const maxPipeHeight = 25;
 
+// Sounds
+const die_sound = new Audio('flappy-bird-assets/audio/die.ogg');
+const point_sound = new Audio('flappy-bird-assets/audio/point.ogg');
+const swoosh_sound = new Audio('flappy-bird-assets/audio/swoosh.ogg');
+const wing_sound = new Audio('flappy-bird-assets/audio/wing.ogg');
+
 window.onload = welcomePage();
 
 function welcomePage() {
@@ -55,6 +61,7 @@ function checkKey(e) {
 }
 
 function startGame() {
+    swoosh_sound.play();
     isPlaying = true;
     window.removeEventListener('keydown', checkKey);
     gameBoard.removeEventListener('click', startGame)
@@ -127,7 +134,6 @@ function managePipes() {
 }
 
 setInterval(() => {
-    // checkCollision();
     updateScore();
 }, 100)
 
@@ -140,7 +146,8 @@ function updateScore() {
         let pipeX = pipeRect.x;
 
         // the 40 that is added to pipeX is to enture that the bird has completely passed the pipe
-        if (birdRect.x > (pipeX + 40) && !pipe.hasAttribute('scored')) {
+        if (birdRect.x > (pipeX + 50) && !pipe.hasAttribute('scored')) {
+            point_sound.play();
             scoreCounter++;
             pipe.setAttribute('scored', 'true');
             changeTheScoreImg(scoreCounter);
@@ -224,6 +231,7 @@ function checkCollision() {
 }
 
 function gameOver() {
+    die_sound.play();
     fallAnimation();
     isPlaying = false;
     birdImg.src = "flappy-bird-assets/sprites/yellowbird-midflap.png";
