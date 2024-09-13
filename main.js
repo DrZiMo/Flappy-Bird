@@ -60,6 +60,54 @@ function checkKey(e) {
     }
 }
 
+const assets = {
+    images: [
+        'path/to/image1.png',
+        'path/to/image2.png',
+        'path/to/bird.png'
+    ],
+    sounds: [
+        'path/to/jump-sound.mp3',
+        'path/to/die-sound.mp3',
+        'path/to/swoosh-sound.mp3'
+    ]
+};
+
+let loadedImages = [];
+let loadedSounds = [];
+
+function preloadImages(imageArray) {
+    return Promise.all(imageArray.map(src => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = src;
+            img.onload = () => resolve(img);
+            img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
+        });
+    }));
+}
+
+function preloadSounds(soundArray) {
+    return Promise.all(soundArray.map(src => {
+        return new Promise((resolve, reject) => {
+            const audio = new Audio(src);
+            audio.oncanplaythrough = () => resolve(audio);
+            audio.onerror = () => reject(new Error(`Failed to load sound: ${src}`));
+        });
+    }));
+}
+
+function loadAssets() {
+    return Promise.all([
+        preloadImages(assets.images),
+        preloadSounds(assets.sounds)
+    ]);
+}
+
+loadAssets()
+    .then(() => startGame())
+    .catch(error => console.error(error));
+
 function startGame() {
     swoosh_sound.play();
     isPlaying = true;
@@ -72,9 +120,8 @@ function startGame() {
     score.style.setProperty('display', 'block');
     bird.style.setProperty('display', 'block');
     moveBird();
-    birdControl();
+    birdJump();
     applyGravity();
-    // setTimeout(upplyGravity, 1000)
     setTimeout(generatePipes, pipeWaitingTime)
     ground.style = `animation: move ${speed}s linear infinite;`;
     console.log("started the game");
@@ -181,8 +228,21 @@ function changeTheScoreImg(score) {
     }
 }
 
-function birdControl() {
-    gameBoard.onclick = () => {
+function birdJump() {
+    const jump = () => {
+        posiY -= jumpHeight;
+        wing_sound.play();
+    };
+
+    gameBoard.onclick = jump;
+    gameBoard.addEventListener('touchstart', jump);
+    document.addEventListener('keydown', checkSpaceKey);
+}
+
+function checkSpaceKey(e) {
+    let key = e.keyCode;
+
+    if (key == 32) {
         posiY -= jumpHeight;
     }
 }
@@ -193,13 +253,11 @@ function applyGravity() {
         bird.style = `transform: translateY(${posiY}px)`
         posiY += gravity;
         requestAnimationFrame(applyGravity);
-        // setTimeout(applyGravity, 1);
     }
     return posiY;
 }
 
 function checkCollision() {
-    const pipes = document.querySelectorAll('.pipes');
     const upperPipes = document.querySelectorAll('.upper-pipe');
     const lowerPipes = document.querySelectorAll('.lower-pipe');
 
@@ -214,7 +272,6 @@ function checkCollision() {
 
     upperPipes.forEach((upperPipe) => {
         const upperPipeRect = upperPipe.getBoundingClientRect();
-        // const lowerPipeRect = lowerPipe.getBoundingClientRect();
         if (birdRect.left < upperPipeRect.right && birdRect.right > upperPipeRect.left &&
             birdRect.top < upperPipeRect.bottom && birdRect.bottom > upperPipeRect.top) {
             gameOver();
