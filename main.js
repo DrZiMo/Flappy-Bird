@@ -50,7 +50,7 @@ const wing_sound = new Audio('flappy-bird-assets/audio/wing.ogg');
 
 function loadScores() {
     const savedScores = localStorage.getItem('scores');
-    if (saveScores) {
+    if (savedScores) {
         scores = JSON.parse(savedScores);
     } else {
         scores = [];
@@ -59,6 +59,11 @@ function loadScores() {
 
 loadScores()
 
+
+function addScore(newScore) {
+    scores.push(newScore);
+    saveScores();
+}
 
 window.onload = welcomePage();
 
@@ -357,8 +362,7 @@ function saveScores() {
 function gameOver() {
     die_sound.play();
     fallAnimation();
-    scores.push(scoreCounter);
-    saveScores();
+    addScore(scoreCounter)
     gameOverDisplay();
     isPlaying = false;
     birdImg.src = "flappy-bird-assets/sprites/yellowbird-midflap.png";
