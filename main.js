@@ -7,11 +7,20 @@ const scoreImgO = document.getElementById('score-img3');
 const bird = document.querySelector('.bird');
 const birdImg = document.getElementById('bird-img');
 const ground = document.querySelector('.ground');
+const gameOverConatiner = document.querySelector('.game-over');
+const gameOverScoreImgH = document.getElementById('go-score-img1');
+const gameOverScoreImgT = document.getElementById('go-score-img2');
+const gameOverScoreImgO = document.getElementById('go-score-img3');
+const gameOverBestScoreImgH = document.getElementById('bt-score-img1');
+const gameOverBestScoreImgT = document.getElementById('bt-score-img2');
+const gameOverBestScoreImgO = document.getElementById('bt-score-img3');
+const restartBtn = document.getElementById('restartBtn');
 
 let gravity = 4;
 let jumpHeight = 110; // 35
 let posiY = 0;
 let scoreCounter = 0;
+let scores = [];
 let isPlaying = false;
 let speed = 5;
 let birdMovement = [
@@ -39,37 +48,40 @@ const point_sound = new Audio('flappy-bird-assets/audio/point.ogg');
 const swoosh_sound = new Audio('flappy-bird-assets/audio/swoosh.ogg');
 const wing_sound = new Audio('flappy-bird-assets/audio/wing.ogg');
 
-window.onload = welcomePage();
-
-function welcomePage() {
-    welcome.style.setProperty('display', 'flex');
-    score.style.setProperty('display', 'none');
-    bird.style.setProperty('display', 'none');
-    gameBoard.addEventListener('click', startGame);
-    window.addEventListener('keydown', checkKey);
-}
-
-function checkKey(e) {
-    let key = e.keyCode;
-
-    // space = 32
-    if (key == 32) {
-        startGame()
-        window.removeEventListener('keydown', checkKey);
-        gameBoard.removeEventListener('click', startGame);
+function loadScores() {
+    const savedScores = localStorage.getItem('scores');
+    if (saveScores) {
+        scores = JSON.parse(savedScores);
+    } else {
+        score = []
     }
 }
 
+loadScores()
+
+
+window.onload = welcomePage();
+
 const assets = {
     images: [
-        'path/to/image1.png',
-        'path/to/image2.png',
-        'path/to/bird.png'
+        'flappy-bird-assets/sprites/0.png',
+        'flappy-bird-assets/sprites/1.png',
+        'flappy-bird-assets/sprites/2.png',
+        'flappy-bird-assets/sprites/3.png',
+        'flappy-bird-assets/sprites/4.png',
+        'flappy-bird-assets/sprites/5.png',
+        'flappy-bird-assets/sprites/6.png',
+        'flappy-bird-assets/sprites/7.png',
+        'flappy-bird-assets/sprites/8.png',
+        'flappy-bird-assets/sprites/9.png',
+        'flappy-bird-assets/sprites/yellowbird-upflap.png',
+        'flappy-bird-assets/sprites/yellowbird-midflap.png',
+        'flappy-bird-assets/sprites/yellowbird-downflap.png'
     ],
     sounds: [
-        'path/to/jump-sound.mp3',
-        'path/to/die-sound.mp3',
-        'path/to/swoosh-sound.mp3'
+        'flappy-bird-assets/audio/point.ogg',
+        'flappy-bird-assets/audio/die.ogg',
+        'flappy-bird-assets/audio/swoosh.ogg'
     ]
 };
 
@@ -105,8 +117,35 @@ function loadAssets() {
 }
 
 loadAssets()
-    .then(() => startGame())
+    .then(() => welcomePage())
     .catch(error => console.error(error));
+
+
+function welcomePage() {
+    welcome.style.setProperty('display', 'flex');
+    score.style.setProperty('display', 'none');
+    bird.style.setProperty('display', 'none');
+    bird.style.top = 'calc(50% + 50px);';
+    bird.style.left = '50%;';
+    gameOverConatiner.style.setProperty('display', 'none');
+
+    gameBoard.removeEventListener('click', startGame);
+    window.removeEventListener('keydown', checkKey);
+
+    gameBoard.addEventListener('click', startGame);
+    window.addEventListener('keydown', checkKey);
+}
+
+function checkKey(e) {
+    let key = e.keyCode;
+
+    // space = 32
+    if (key == 32) {
+        startGame()
+        window.removeEventListener('keydown', checkKey);
+        gameBoard.removeEventListener('click', startGame);
+    }
+}
 
 function startGame() {
     swoosh_sound.play();
@@ -197,46 +236,69 @@ function updateScore() {
             point_sound.play();
             scoreCounter++;
             pipe.setAttribute('scored', 'true');
-            changeTheScoreImg(scoreCounter);
+            scoreImgO.src = changeTheScoreImg(scoreCounter).src;
+            if (scoreCounter > 9) {
+                scoreImgT.style.setProperty('display', 'inline');
+                scoreImgT.src = changeTheScoreImg(scoreCounter).srcT;
+            } else {
+                scoreImgT.style.setProperty('display', 'none');
+            }
+            if (scoreCounter > 99) {
+                scoreImgH.style.setProperty('display', 'inline');
+                scoreImgH.src = changeTheScoreImg(scoreCounter).srcH;
+            } else {
+                scoreImgH.style.setProperty('display', 'none');
+            }
         }
     })
 }
 
 function changeTheScoreImg(score) {
     let path = "flappy-bird-assets/sprites/";
+    let src = '';
+    let srcT = '';
+    let srcH = '';
     if(score < 10) {
-        scoreImgO.src = `${path}${score}.png`;
+        src = `${path}${score}.png`;
+        return {src};
     }
     else if (score > 9 && score < 100) {
-        scoreImgT.style.setProperty('display', 'inline');
+        
         let tens = Math.floor(score / 10);
         let ones = score % 10;
 
-        scoreImgT.src = `${path}${tens}.png`;
-        scoreImgO.src = `${path}${ones}.png`
+        src = `${path}${ones}.png`;
+        srcT = `${path}${tens}.png`;
+
+        return {src, srcT};
     }
     else if (score > 99 && score < 1000) {
-        scoreImgT.style.setProperty('display', 'inline');
-        scoreImgH.style.setProperty('display', 'inline');
+        
         let hundreds = Math.floor(score / 100);
         let tens = Math.floor((score % 100) / 10);
         let ones = score % 10;
 
-        scoreImgH.src = `${path}${hundreds}.png`;
-        scoreImgT.src = `${path}${tens}.png`;
-        scoreImgO.src = `${path}${ones}.png`
+        src = `${path}${ones}.png`;
+        srcT = `${path}${tens}.png`;
+        srcH = `${path}${hundreds}.png`;
+
+        return {src, srcT, srcH};
     }
 }
 
 function birdJump() {
     const jump = () => {
         posiY -= jumpHeight;
-        wing_sound.play();
     };
 
-    gameBoard.onclick = jump;
-    gameBoard.addEventListener('touchstart', jump);
-    document.addEventListener('keydown', checkSpaceKey);
+    if (isPlaying) {
+        gameBoard.onclick = jump;
+        gameBoard.addEventListener('touchstart', jump);
+        document.addEventListener('keydown', checkSpaceKey);
+    } else {
+        gameBoard.removeEventListener('touchstart', jump);
+        document.removeEventListener('keydown', checkSpaceKey);
+    }
 }
 
 function checkSpaceKey(e) {
@@ -287,9 +349,17 @@ function checkCollision() {
     })
 }
 
+function saveScores() {
+    const uniqueScore = scores.filter((value, index) => scores.indexOf(value) == index);
+    localStorage.setItem('scores', JSON.stringify(uniqueScore));
+}
+
 function gameOver() {
     die_sound.play();
     fallAnimation();
+    scores.push(scoreCounter);
+    saveScores();
+    gameOverDisplay();
     isPlaying = false;
     birdImg.src = "flappy-bird-assets/sprites/yellowbird-midflap.png";
     ground.style.animation = "none";
@@ -320,3 +390,54 @@ function fallAnimation() {
 
     animateFall();
 }
+
+// Game Over Structure
+function gameOverDisplay() {
+    let bestScore = scores[0];
+
+    for (let i = 1; i < scores.length; i++) {
+        if (scores[i] > bestScore) {
+            bestScore = scores[i];
+        }
+    }
+    gameOverConatiner.style.setProperty('display', 'flex');
+
+    // Setting The Score in Game Over part
+    gameOverScoreImgO.src = changeTheScoreImg(scoreCounter).src;
+    if (scoreCounter > 9) {
+        gameOverScoreImgT.style.setProperty('display', 'inline')
+        gameOverScoreImgT.src = changeTheScoreImg(scoreCounter).srcT;
+    
+    } else {
+        gameOverScoreImgT.style.setProperty('display', 'none')
+    }
+
+    if (scoreCounter > 99) {
+        gameOverScoreImgH.style.setProperty('display', 'inline')
+        gameOverScoreImgH.src = changeTheScoreImg(scoreCounter).srcH;
+    } else {
+        gameOverScoreImgH.style.setProperty('display', 'none')
+    }
+    
+    // Setting The Best Score in Game Over part
+    gameOverBestScoreImgO.src = changeTheScoreImg(bestScore).src;
+    if (bestScore > 9) {
+        gameOverBestScoreImgT.style.setProperty('display', 'inline')
+        gameOverBestScoreImgT.src = changeTheScoreImg(bestScore).srcT;
+    
+    } else {
+        gameOverBestScoreImgT.style.setProperty('display', 'none')
+    }
+
+    if (bestScore > 99) {
+        gameOverBestScoreImgH.style.setProperty('display', 'inline')
+        gameOverBestScoreImgH.src = changeTheScoreImg(bestScore).srcH;
+    } else {
+        gameOverBestScoreImgH.style.setProperty('display', 'none');
+    };
+}
+
+// restart
+restartBtn.addEventListener('click', () => {
+    window.location.reload()
+})

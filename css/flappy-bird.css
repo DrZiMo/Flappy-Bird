@@ -1,6 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&family=Nerko+One&display=swap');
 
 :root {
     --bg-color: #daf6d9;
+    --light-orange: #FFF9BF;
+    --orange: #F24E1E;
+    --white: #fff;
 
     --game-width: 480px;
     --game-height: 640px;
@@ -9,6 +13,9 @@
     --bird-height: 24px;
 
     --pipe-widht: 52px;
+
+    --fw-regular: 500;
+    --fw-bold: 800;
 }
 
 *,
@@ -22,6 +29,7 @@
 body {
     background-color: var(--bg-color);
     overflow: hidden;
+    font-family: "Kode Mono", monospace;
 }
 
 .game {
@@ -55,13 +63,66 @@ body {
     position: absolute;
 }
 
+/* Game Over */
+.game .container .game-board .game-over {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: absolute;
+    text-align: center;
+    z-index: 100;
+}
+
+.game .container .game-board .game-over .best-score {
+    background-color: var(--light-orange);
+    padding: 15px 25px;
+    margin-top: 20px;
+    border: 2px solid black;
+    border-radius: 10px;
+}
+
+.game .container .game-board .game-over .best-score h3 {
+    padding: 0;
+    margin: 10px 0;
+    color: var(--orange);
+    font-weight: var(--fw-bold);
+}
+
+.game .container .game-board .game-over .best-score img {
+    margin-left: -5px;
+}
+
+.game .container .game-board .game-over .best-score .current-score {
+    margin-bottom: 20px;
+}
+
+.game .container .game-board .game-over .restart {
+    margin-top: 25px;
+}
+
+.game .container .game-board .game-over .restart button {
+    background-color: var(--orange);
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--white);
+    padding: 10px 20px;
+    border: 4px solid brown;
+    border-bottom-width: 7px;
+    box-shadow: inset 0 0px 0 5px var(--white);
+    cursor: pointer;
+}
+
 /* score */
 .game .container .game-board .score {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 5px;
+    gap: 0px;
     top: 35px;
     z-index: 10;
 }
