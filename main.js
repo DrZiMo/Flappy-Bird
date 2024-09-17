@@ -53,7 +53,7 @@ function loadScores() {
     if (saveScores) {
         scores = JSON.parse(savedScores);
     } else {
-        score = []
+        scores = [];
     }
 }
 
